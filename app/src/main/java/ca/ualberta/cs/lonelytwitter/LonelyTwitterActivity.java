@@ -69,21 +69,31 @@ public class LonelyTwitterActivity extends Activity {
 
 			public void onClick(View v) {
 				setResult(RESULT_OK);
-				tweetList.clear();
-				deleteFile(FILENAME);  // TODO deprecate this button
+				String text = bodyText.getText().toString();
+
+
 				adapter.notifyDataSetChanged();
+				ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
+				getTweetsTask.execute("ME");
+				try {
+					tweetList = getTweetsTask.get();
+				}
+				catch (Exception e) {
+					Log.i("Error", "Failed to get the tweets out of the async object.");
+				}
+
 			}
 		});
 
 		oldTweetsList.setOnItemClickListener(new
-				AdapterView.OnItemClickListener(){
-					public void onItemClick(AdapterView<?> parent, View view,
-											int position ,long id){
-						Intent intent = new Intent(activity, EditTweetActivity.class);
-						startActivity(intent);
-					}
+													 AdapterView.OnItemClickListener() {
+														 public void onItemClick(AdapterView<?> parent, View view,
+																				 int position, long id) {
+															 Intent intent = new Intent(activity, EditTweetActivity.class);
+															 startActivity(intent);
+														 }
 
-				});
+													 });
 
 
 	}
@@ -94,7 +104,7 @@ public class LonelyTwitterActivity extends Activity {
 		super.onStart();
 		// loadFromFile(); // TODO replace this with elastic search
 		ElasticsearchTweetController.GetTweetsTask getTweetsTask = new ElasticsearchTweetController.GetTweetsTask();
-		getTweetsTask.execute("");
+		getTweetsTask.execute("RED");
 		try {
 			tweetList = getTweetsTask.get();
 		}
